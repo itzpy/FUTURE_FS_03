@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react';
 import { useState } from 'react'
 import { Menu, X, Star, User, ShoppingBag, Activity, Dumbbell } from 'lucide-react'
 import { motion } from 'framer-motion'

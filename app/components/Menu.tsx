@@ -1,10 +1,12 @@
 'use client'
 
+import React from 'react';
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Star, Plus, Minus, Loader2 } from 'lucide-react'
 import Image from 'next/image'
-import { fetchProductsByCategory, fetchProducts, Product } from '@/lib/supabase'
+import { fetchProductsByCategory, fetchProducts } from '@/lib/supabase'
+import { Product } from '@/lib/models'
 
 type CategoryItem = {
   id: string;
@@ -24,7 +26,7 @@ const productCategories: CategoryItem[] = [
 const demoProducts = {
   footwear: [
     {
-      id: 1,
+      id: '1',
       name: 'Ultra Boost AI',
       description: 'Our AI-engineered running shoe with responsive cushioning, adaptive support, and breathable Primeknit upper. Perfect for long-distance running.',
       price: 189.95,
@@ -34,7 +36,7 @@ const demoProducts = {
       category: 'footwear'
     },
     {
-      id: 2,
+      id: '2',
       name: 'Cloudfoam Striker',
       description: 'Lightweight and responsive with innovative Cloudfoam technology for maximum comfort and energy return. Ideal for everyday training.',
       price: 129.75,
@@ -46,7 +48,7 @@ const demoProducts = {
   ],
   apparel: [
     {
-      id: 5,
+      id: '5',
       name: 'TechFit Training Tee',
       description: 'Advanced compression technology with moisture-wicking fabric and targeted support zones for maximum athletic performance.',
       price: 59.95,
@@ -60,7 +62,7 @@ const demoProducts = {
 
 export function Menu() {
   const [activeCategory, setActiveCategory] = useState('footwear')
-  const [cart, setCart] = useState<{[key: number]: number}>({})
+  const [cart, setCart] = useState<{[key: string]: number}>({})
   const [products, setProducts] = useState<{[key: string]: Product[]}>({})
   const [isLoading, setIsLoading] = useState(true)
 
@@ -98,14 +100,14 @@ export function Menu() {
     loadProducts();
   }, []);
 
-  const addToCart = (itemId: number) => {
+  const addToCart = (itemId: string) => {
     setCart(prev => ({
       ...prev,
       [itemId]: (prev[itemId] || 0) + 1
     }))
   }
 
-  const removeFromCart = (itemId: number) => {
+  const removeFromCart = (itemId: string) => {
     setCart(prev => ({
       ...prev,
       [itemId]: Math.max((prev[itemId] || 0) - 1, 0)
@@ -248,21 +250,21 @@ export function Menu() {
                       </span>
                       
                       <div className="flex items-center space-x-2">
-                        {cart[item.id] > 0 && (
+                        {item.id && cart[item.id] > 0 && (
                           <>
                             <button
-                              onClick={() => removeFromCart(item.id)}
+                              onClick={() => item.id && removeFromCart(item.id)}
                               className="w-8 h-8 bg-neutral-200 hover:bg-neutral-300 rounded-full flex items-center justify-center transition-colors duration-200"
                             >
                               <Minus className="h-4 w-4" />
                             </button>
                             <span className="font-medium min-w-[20px] text-center">
-                              {cart[item.id]}
+                              {item.id && cart[item.id]}
                             </span>
                           </>
                         )}
                         <button
-                          onClick={() => addToCart(item.id)}
+                          onClick={() => item.id && addToCart(item.id)}
                           className="w-8 h-8 bg-primary-600 hover:bg-primary-700 text-white rounded-full flex items-center justify-center transition-colors duration-200"
                         >
                           <Plus className="h-4 w-4" />
