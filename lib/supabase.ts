@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { Product, ContactSubmission } from './models';
 
+// Re-export types for convenience
+export type { Product, ContactSubmission } from './models';
+
 // Helper to check if we're in a browser context
 const isBrowser = typeof window !== 'undefined';
 
