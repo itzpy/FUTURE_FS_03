@@ -12,17 +12,11 @@ const nextConfig = {
       'bjgkzymtpcajejcywlht.supabase.co' // Supabase storage domain
     ],
     unoptimized: true, // Required for static export
-    disableStaticImages: true, // Disable static image optimization
   },
+  // Remove experimental flags for compatibility
+  swcMinify: false, // Disable SWC minifier 
   compiler: {
-    styledComponents: true,
-  },
-  experimental: {
-    optimizeCss: false, // Disable CSS optimization
-    craCompat: true, // Increase compatibility
-    turbotrace: {
-      logLevel: 'error'
-    }
+    removeConsole: false,
   }
 }
 
