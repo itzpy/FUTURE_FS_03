@@ -1,5 +1,12 @@
 # This script sets up the entire Abibas project with Supabase, AI image generation, and dependencies
 
+Write-Host "🚀 Setting up Abibas Rebrand Project..." -ForegroundColor Green
+Write-Host "-------------------------------------" -ForegroundColor Cyan
+
+# Clear NODE_OPTIONS to prevent compatibility issues with Node.js 23
+$env:NODE_OPTIONS=""
+Write-Host "🔧 Cleared NODE_OPTIONS for compatibility" -ForegroundColor Yellow
+
 # Load environment variables
 if (Test-Path .env.local) {
     Get-Content .env.local | ForEach-Object {
@@ -13,9 +20,9 @@ if (Test-Path .env.local) {
     Write-Host "⚠️ No .env.local file found. Please create one based on .env.example" -ForegroundColor Yellow
 }
 
-# Install dependencies
+# Install dependencies with Node.js compatibility fixes
 Write-Host "📦 Installing project dependencies..." -ForegroundColor Cyan
-npm install
+& "C:\Program Files\nodejs\npm.cmd" install --legacy-peer-deps
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ Error installing dependencies" -ForegroundColor Red
     exit 1

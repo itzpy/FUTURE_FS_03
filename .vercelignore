@@ -1,0 +1,10 @@
+.git
+.github
+.gitignore
+*.log
+README.md
+DEPLOYMENT.md
+ADMIN_GUIDE.md
+SUMMARY.md
+DEPLOYMENT_CHECKLIST.md
+*.ps1

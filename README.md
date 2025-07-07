@@ -25,7 +25,9 @@ This is a modern rebrand of Adidas using AI-generated branding assets and cuttin
 - **Lucide React** - Beautiful icons
 
 ### Backend & Services
-- **Supabase** - Database, storage, and API
+- **Supabase** - Database, authentication, and storage
+- **PostgreSQL** - Relational database via Supabase
+- **Supabase Storage** - Media storage
 - **Replicate** - AI image generation via Stable Diffusion
 - **Next SEO** - SEO optimization with structured data
 - **React Hook Form** - Form management
@@ -89,13 +91,10 @@ This is a modern rebrand of Adidas using AI-generated branding assets and cuttin
 3. **Set up environment variables**
    Create a `.env.local` file in the root directory:
    ```env
-   NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-   NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   REPLICATE_API_TOKEN=your_replicate_api_token
    ```
 
 4. **Run the development server**
@@ -124,7 +123,7 @@ FUTURE_FS_03/
 │   ├── page.tsx          # Home page
 │   └── seo.config.ts     # SEO configuration
 ├── lib/
-│   └── firebase.ts       # Firebase configuration
+│   └── supabase.ts       # Supabase configuration and database functions
 ├── public/               # Static assets
 ├── tailwind.config.js    # Tailwind configuration
 ├── next.config.js        # Next.js configuration
@@ -197,11 +196,16 @@ colors: {
 3. Use TypeScript for type safety
 4. Implement responsive design
 
-### Firebase Setup
-1. Create a new Firebase project
-2. Enable Firestore, Authentication, and Storage
-3. Add your config to `.env.local`
-4. Customize data structure in Firebase console
+### Supabase Setup
+✅ **Already completed!** Your Supabase project is set up and configured:
+- Project: `abibas-rebrand` 
+- Database: PostgreSQL with products and contact_submissions tables
+- RLS (Row Level Security): Enabled with appropriate policies
+- Environment variables: Already configured in `.env.local`
+
+The database schema includes:
+- **products**: Store product catalog with ratings, images, and categories
+- **contact_submissions**: Store customer inquiries and feedback
 
 ## 🎯 Performance Features
 

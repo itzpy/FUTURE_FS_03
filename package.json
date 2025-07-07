@@ -1,39 +1,36 @@
 {
-    "name":  "abibas-rebrand",
-    "version":  "0.1.0",
-    "private":  true,
-    "scripts":  {
-                    "dev":  "next dev",
-                    "build":  "next build",
-                    "start":  "next start",
-                    "lint":  "next lint",
-                    "init:supabase":  "node scripts/initSupabase.js",
-                    "generate:images":  "node scripts/generateProductImages.js",
-                    "manage:products":  "node scripts/manageProducts.js"
-                },
-    "dependencies":  {
-                         "@supabase/supabase-js":  "^2.50.3",
-                         "autoprefixer":  "^10.4.16",
-                         "dotenv":  "^16.6.1",
-                         "framer-motion":  "^10.16.4",
-                         "lucide-react":  "^0.294.0",
-                         "next":  "14.0.0",
-                         "next-seo":  "^6.4.0",
-                         "postcss":  "^8.4.31",
-                         "react":  "^18.2.0",
-                         "react-dom":  "^18.2.0",
-                         "react-hook-form":  "^7.48.2",
-                         "react-hot-toast":  "^2.4.1",
-                         "replicate":  "^0.25.2",
-                         "sharp":  "^0.32.6",
-                         "tailwindcss":  "^3.3.0"
-                     },
-    "devDependencies":  {
-                            "@types/node":  "^20.8.10",
-                            "@types/react":  "^18.2.37",
-                            "@types/react-dom":  "^18.2.15",
-                            "eslint":  "^8.53.0",
-                            "eslint-config-next":  "14.0.0",
-                            "typescript":  "^5.2.2"
-                        }
+    "name": "abibas-rebrand",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "build": "next build",
+        "dev": "next dev",
+        "start": "next start",
+        "export": "next build",
+        "build:static": "next build"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.50.3",
+        "autoprefixer": "^10.4.16",
+        "dotenv": "^16.6.1",
+        "framer-motion": "^10.16.4",
+        "lucide-react": "^0.294.0",
+        "next": "14.0.0",
+        "next-seo": "^6.4.0",
+        "postcss": "^8.4.31",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-hook-form": "^7.48.2",
+        "react-hot-toast": "^2.4.1",
+        "replicate": "^0.25.2",
+        "tailwindcss": "^3.3.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.8.10",
+        "@types/react": "^18.2.37",
+        "@types/react-dom": "^18.2.15",
+        "eslint": "^8.53.0",
+        "eslint-config-next": "14.0.0",
+        "typescript": "^5.2.2"
+    }
 }

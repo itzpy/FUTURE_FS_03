@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
+  output: 'export', // Enable static exports
   images: {
     domains: [
       'images.unsplash.com',
@@ -13,10 +11,19 @@ const nextConfig = {
       'plus.unsplash.com',
       'bjgkzymtpcajejcywlht.supabase.co' // Supabase storage domain
     ],
+    unoptimized: true, // Required for static export
+    disableStaticImages: true, // Disable static image optimization
   },
   compiler: {
     styledComponents: true,
   },
+  experimental: {
+    optimizeCss: false, // Disable CSS optimization
+    craCompat: true, // Increase compatibility
+    turbotrace: {
+      logLevel: 'error'
+    }
+  }
 }
 
 module.exports = nextConfig

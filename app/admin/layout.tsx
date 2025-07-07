@@ -22,6 +22,8 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [hasSupabaseConfig] = useState(!!process.env.NEXT_PUBLIC_SUPABASE_URL && 
+    !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   
   const navigationItems = [
     {
@@ -50,6 +52,22 @@ export default function AdminLayout({
       icon: Settings
     }
   ];
+
+  // If Supabase is not configured, show a warning message
+  if (!hasSupabaseConfig) {
+    return (
+      <div className="flex min-h-screen bg-neutral-100 justify-center items-center">
+        <div className="bg-white shadow-md rounded-lg p-8 max-w-md text-center">
+          <h1 className="text-2xl font-bold text-red-500 mb-4">⚠️ Admin Panel Not Available</h1>
+          <p className="mb-4">Supabase environment variables are not configured properly.</p>
+          <p className="mb-6 text-sm text-gray-500">Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.</p>
+          <Link href="/" className="bg-primary-600 text-white px-4 py-2 rounded hover:bg-primary-700">
+            Return to Home Page
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-neutral-100">

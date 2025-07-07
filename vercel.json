@@ -1,0 +1,22 @@
+{
+    "version": 2,
+    "buildCommand": "npm run build",
+    "installCommand": "npm install --legacy-peer-deps",
+    "outputDirectory": "out",
+    "env": {
+        "NEXT_PUBLIC_VERCEL_ENV": "production",
+        "NEXT_PUBLIC_SITE_URL": "https://abibas-future.vercel.app",
+        "NEXT_PUBLIC_SUPABASE_URL": "https://ormhnzwuzktdqkmpbdmj.supabase.co",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ybWhuend1emt0ZHFrbXBiZG1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4Nzg3MzgsImV4cCI6MjA2NzQ1NDczOH0.2Thu_0Zxy3cKkjocfNcRXYEcS_5DCl94o4TrBPZg_vI"
+    },
+    "builds": [
+        {
+            "src": "package.json",
+            "use": "@vercel/next",
+            "config": {
+                "installCommand": "npm install --legacy-peer-deps",
+                "buildCommand": "npm run build"
+            }
+        }
+    ]
+}

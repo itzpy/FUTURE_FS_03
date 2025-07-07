@@ -12,11 +12,19 @@ export default function AdminDashboard() {
     revenue: 0
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function fetchDashboardData() {
       setLoading(true);
       try {
+        // Verify Supabase connection first to prevent SSR errors
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+          setError("Supabase URL not configured");
+          setLoading(false);
+          return;
+        }
+        
         // Fetch product count
         const { count: productCount, error: productError } = await supabase
           .from('products')

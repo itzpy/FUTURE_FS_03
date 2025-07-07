@@ -18,6 +18,7 @@ const poppins = Poppins({
 })
 
 export const metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://abibas-future.vercel.app'),
   title: 'Abibas - Performance Sportswear Reimagined',
   description: 'Experience the future of sportswear with Abibas. AI-powered performance meets premium design in our modern athletic products.',
   keywords: 'sportswear, athletic shoes, performance apparel, sports equipment, activewear',

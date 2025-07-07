@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu, X, Star, User, ShoppingBag, Activity } from 'lucide-react'
+import { Menu, X, Star, User, ShoppingBag, Activity, Dumbbell } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export function Navbar() {
@@ -26,10 +26,10 @@ export function Navbar() {
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
             <div className="bg-gradient-primary p-2 rounded-full">
-              <Coffee className="h-6 w-6 text-white" />
+              <Dumbbell className="h-6 w-6 text-white" />
             </div>
             <span className="text-2xl font-heading font-bold text-gradient">
-              StellarBucks
+              Abibas
             </span>
           </motion.div>
 
