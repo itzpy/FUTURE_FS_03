@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Product } from '@/lib/schema';
+import { Product } from '@/lib/models';
 import { fetchProducts } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase';
 import { uploadProductImage } from '@/lib/images';
@@ -11,7 +11,7 @@ import { toast } from 'react-hot-toast';
 export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<number | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Product>>({});
   const [isCreating, setIsCreating] = useState(false);
   const [newProduct, setNewProduct] = useState<Partial<Product>>({
@@ -40,7 +40,7 @@ export default function AdminPage() {
   }
 
   function startEdit(product: Product) {
-    setEditing(product.id);
+    setEditing(product.id || null);
     setEditForm({ ...product });
   }
 
@@ -80,7 +80,7 @@ export default function AdminPage() {
     }
   }
 
-  async function deleteProduct(id: number) {
+  async function deleteProduct(id: string) {
     if (!confirm('Are you sure you want to delete this product?')) return;
 
     try {
@@ -453,7 +453,7 @@ export default function AdminPage() {
                           <Pencil size={18} />
                         </button>
                         <button 
-                          onClick={() => deleteProduct(product.id)}
+                          onClick={() => product.id && deleteProduct(product.id)}
                           className="p-1 bg-red-100 text-red-700 rounded hover:bg-red-200"
                         >
                           <Trash size={18} />

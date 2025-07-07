@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Mail, Eye, Trash, Search, Filter, RefreshCw } from 'lucide-react';
-import { ContactSubmission } from '@/lib/schema';
+import { ContactSubmission } from '@/lib/models';
 
 export default function MessagesAdmin() {
   const [messages, setMessages] = useState<ContactSubmission[]>([]);
@@ -32,7 +32,7 @@ export default function MessagesAdmin() {
     setLoading(false);
   }
 
-  async function deleteMessage(id: number) {
+  async function deleteMessage(id: string) {
     if (!confirm('Are you sure you want to delete this message?')) return;
 
     try {
@@ -76,8 +76,8 @@ export default function MessagesAdmin() {
     if (filter === 'all') return matchesSearch;
     
     // Example filters (could be implemented with actual read/unread statuses in a real app)
-    if (filter === 'read') return matchesSearch && (msg.id ?? 0) % 2 === 0; // Just an example
-    if (filter === 'unread') return matchesSearch && (msg.id ?? 0) % 2 !== 0; // Just an example
+    if (filter === 'read') return matchesSearch && msg.id && msg.id.length % 2 === 0; // Just an example
+    if (filter === 'unread') return matchesSearch && msg.id && msg.id.length % 2 !== 0; // Just an example
     
     return matchesSearch;
   });
