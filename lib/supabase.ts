@@ -11,15 +11,27 @@ const isBrowser = typeof window !== 'undefined';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// Validate required environment variables
+// For static generation, provide fallback values
+const fallbackUrl = 'https://placeholder.supabase.co';
+const fallbackKey = 'placeholder-key';
+
+// Validate required environment variables - use fallbacks during build
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    'Missing Supabase environment variables. Please check your .env.local file.'
-  );
+  if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
+    // During static generation, use placeholder values
+    console.warn('Using placeholder Supabase values for static generation');
+  } else {
+    throw new Error(
+      'Missing Supabase environment variables. Please check your .env.local file.'
+    );
+  }
 }
 
 // Create a single supabase client for the entire app
-const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+const supabase = createClient(
+  supabaseUrl || fallbackUrl, 
+  supabaseAnonKey || fallbackKey, 
+  {
   auth: {
     persistSession: isBrowser,
     autoRefreshToken: isBrowser,
@@ -31,6 +43,11 @@ export default supabase;
 
 // Fetch all products from Supabase with improved error handling
 export async function fetchProducts(): Promise<Product[]> {
+  // Return empty array during static generation
+  if (typeof window === 'undefined' && (!supabaseUrl || !supabaseAnonKey)) {
+    return [];
+  }
+  
   try {
     const { data, error } = await supabase
       .from('products')
@@ -51,6 +68,11 @@ export async function fetchProducts(): Promise<Product[]> {
 
 // Fetch products by category
 export async function fetchProductsByCategory(category: string): Promise<Product[]> {
+  // Return empty array during static generation
+  if (typeof window === 'undefined' && (!supabaseUrl || !supabaseAnonKey)) {
+    return [];
+  }
+  
   try {
     const { data, error } = await supabase
       .from('products')
