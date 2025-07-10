@@ -54,16 +54,114 @@ document.querySelectorAll('section').forEach(section => {
     observer.observe(section);
 });
 
-// Newsletter form submission
-document.querySelector('form').addEventListener('submit', function(e) {
+// Newsletter form submission with Supabase integration
+document.querySelector('form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const email = this.querySelector('input[type="email"]').value;
+    const submitButton = this.querySelector('button[type="submit"]');
+    const emailInput = this.querySelector('input[type="email"]');
     
-    if (email) {
-        alert('Thank you for subscribing! 🎉');
-        this.reset();
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+        showFormError(emailInput, 'Please enter a valid email address');
+        return;
+    }
+
+    try {
+        // Show loading state
+        submitButton.innerHTML = 'Subscribing...';
+        submitButton.disabled = true;
+        emailInput.disabled = true;
+        
+        // Remove any existing messages
+        removeExistingMessages(this);
+        
+        // Attempt to subscribe via Supabase
+        const result = await subscribeToNewsletter(email);
+        
+        if (result.success) {
+            // Success state
+            showFormSuccess(this, submitButton, emailInput, 'Welcome to Apple updates! You\'re now subscribed.');
+        } else {
+            // Handle specific error types
+            if (result.code === 'DUPLICATE_EMAIL') {
+                showFormError(emailInput, 'This email is already subscribed to our newsletter');
+            } else {
+                showFormError(emailInput, result.error || 'Failed to subscribe. Please try again later.');
+            }
+            
+            // Reset button state on error
+            submitButton.innerHTML = 'Subscribe';
+            submitButton.disabled = false;
+            emailInput.disabled = false;
+        }
+    } catch (error) {
+        console.error('Newsletter subscription error:', error);
+        showFormError(emailInput, 'Connection error. Please check your internet and try again.');
+        
+        // Reset button state on error
+        submitButton.innerHTML = 'Subscribe';
+        submitButton.disabled = false;
+        emailInput.disabled = false;
     }
 });
+
+// Helper function to show form success state
+function showFormSuccess(form, button, input, message) {
+    button.innerHTML = 'Subscribed! ✅';
+    button.style.background = '#34d399';
+    button.style.borderColor = '#34d399';
+    input.value = '';
+    input.placeholder = 'Successfully subscribed!';
+    input.style.borderColor = '#34d399';
+    
+    // Show success message
+    const successMessage = document.createElement('div');
+    successMessage.className = 'newsletter-message success-message text-green-400 text-sm mt-2 animate-fade-in';
+    successMessage.textContent = message;
+    form.appendChild(successMessage);
+    
+    // Reset after 4 seconds
+    setTimeout(() => {
+        button.innerHTML = 'Subscribe';
+        button.disabled = false;
+        button.style.background = '#0071e3';
+        button.style.borderColor = '#0071e3';
+        input.disabled = false;
+        input.placeholder = 'Enter your email';
+        input.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        removeExistingMessages(form);
+    }, 4000);
+}
+
+// Helper function to show form error state
+function showFormError(input, message) {
+    input.style.borderColor = '#ef4444';
+    input.placeholder = message;
+    
+    // Show error message
+    const form = input.closest('form');
+    removeExistingMessages(form);
+    
+    const errorMessage = document.createElement('div');
+    errorMessage.className = 'newsletter-message error-message text-red-400 text-sm mt-2 animate-fade-in';
+    errorMessage.textContent = message;
+    form.appendChild(errorMessage);
+    
+    // Reset styling after 3 seconds
+    setTimeout(() => {
+        input.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        input.placeholder = 'Enter your email';
+        removeExistingMessages(form);
+    }, 3000);
+}
+
+// Helper function to remove existing messages
+function removeExistingMessages(form) {
+    const existingMessages = form.querySelectorAll('.newsletter-message');
+    existingMessages.forEach(msg => msg.remove());
+}
 
 // Add loading animation to page
 window.addEventListener('load', function() {
