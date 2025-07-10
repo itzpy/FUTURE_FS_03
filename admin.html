@@ -303,7 +303,7 @@
             <div id="errorState" class="error-state hidden">
                 <h3>⚠️ Connection Error</h3>
                 <p class="mb-6">Unable to load subscriber data. Please check your connection and try again.</p>
-                <button onclick="refreshData()" class="refresh-btn">
+                <button onclick="retryConnection()" class="refresh-btn">
                     Try Again
                 </button>
             </div>
@@ -340,7 +340,7 @@
         <!-- Footer -->
         <div class="footer-text">
             <p>
-                Built with ❤️ for Future Interns Task 3 | 
+                Built with ❤️ for Apple Rebrand | 
                 <a href="https://apple-rebrand.vercel.app/" class="footer-link">Live Demo</a> | 
                 <a href="#" onclick="refreshData()" class="footer-link">Refresh Data</a>
             </p>
@@ -349,6 +349,15 @@
     </div>
 
     <!-- Include Supabase Config -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Ensure Supabase is loaded before other scripts
+        window.addEventListener('DOMContentLoaded', function() {
+            if (typeof window.supabase === 'undefined') {
+                console.error('Supabase library failed to load');
+            }
+        });
+    </script>
     <script src="supabase-config.js"></script>
     
     <script>
@@ -357,22 +366,40 @@
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            loadSubscribers();
+            console.log('DOM loaded, initializing dashboard...');
+            // Give Supabase a moment to load and initialize
+            setTimeout(() => {
+                console.log('Starting to load subscribers...');
+                loadSubscribers();
+            }, 200);
         });
 
         async function loadSubscribers() {
             try {
                 showLoading();
                 
+                // Ensure Supabase is initialized
+                if (!supabase) {
+                    console.log('Supabase not initialized, attempting to initialize...');
+                    if (!initSupabase()) {
+                        throw new Error('Supabase client not initialized');
+                    }
+                    // Give it a moment to initialize
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                console.log('Fetching subscribers from Supabase...');
                 const { data, error } = await supabase
                     .from('newsletter_subscribers')
                     .select('*')
                     .order('created_at', { ascending: false });
 
                 if (error) {
+                    console.error('Supabase query error:', error);
                     throw error;
                 }
 
+                console.log('Subscribers fetched successfully:', data);
                 subscribers = data || [];
                 updateStats();
                 displaySubscribers();
@@ -468,11 +495,13 @@
         }
 
         function refreshData() {
+            console.log('Refresh button clicked, reloading subscribers...');
             loadSubscribers();
         }
 
         // Add some animation when page loads
         window.addEventListener('load', function() {
+            console.log('Window loaded, adding animations...');
             const cards = document.querySelectorAll('.dashboard-card');
             cards.forEach((card, index) => {
                 setTimeout(() => {
@@ -486,6 +515,12 @@
                 }, index * 200);
             });
         });
+
+        // Add error retry functionality
+        function retryConnection() {
+            console.log('Retrying connection...');
+            loadSubscribers();
+        }
     </script>
 </body>
 </html>
