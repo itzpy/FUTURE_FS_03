@@ -351,14 +351,29 @@
     <!-- Include Supabase Config -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
-        // Ensure Supabase is loaded before other scripts
-        window.addEventListener('DOMContentLoaded', function() {
-            if (typeof window.supabase === 'undefined') {
-                console.error('Supabase library failed to load');
+        // Direct Supabase initialization for admin dashboard
+        const SUPABASE_URL = 'https://nytvnmhoiuutmqcoymif.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55dHZubWhvaXV1dG1xY295bWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4OTk3OTUsImV4cCI6MjA2NzQ3NTc5NX0.6bhZk7ccrjIl0b4anD_DfYPNiBj4wwU5hcpZ37VOrrE';
+        
+        let supabase;
+        
+        // Initialize Supabase when the script loads
+        function initializeSupabase() {
+            try {
+                if (window.supabase && window.supabase.createClient) {
+                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    console.log('Supabase initialized successfully');
+                    return true;
+                } else {
+                    console.error('Supabase library not available');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                return false;
             }
-        });
+        }
     </script>
-    <script src="supabase-config.js"></script>
     
     <script>
         // Admin Dashboard JavaScript
@@ -367,28 +382,33 @@
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing dashboard...');
-            // Give Supabase a moment to load and initialize
+            // Initialize Supabase first
             setTimeout(() => {
-                console.log('Starting to load subscribers...');
-                loadSubscribers();
-            }, 200);
+                if (initializeSupabase()) {
+                    console.log('Starting to load subscribers...');
+                    loadSubscribers();
+                } else {
+                    console.error('Failed to initialize Supabase');
+                    showError();
+                }
+            }, 500); // Increased delay to ensure Supabase library is fully loaded
         });
 
         async function loadSubscribers() {
             try {
                 showLoading();
                 
-                // Ensure Supabase is initialized
+                // Double-check Supabase is available
                 if (!supabase) {
-                    console.log('Supabase not initialized, attempting to initialize...');
-                    if (!initSupabase()) {
-                        throw new Error('Supabase client not initialized');
+                    console.log('Supabase client not available, reinitializing...');
+                    if (!initializeSupabase()) {
+                        throw new Error('Cannot initialize Supabase client');
                     }
-                    // Give it a moment to initialize
-                    await new Promise(resolve => setTimeout(resolve, 100));
                 }
                 
                 console.log('Fetching subscribers from Supabase...');
+                console.log('Supabase client status:', !!supabase);
+                
                 const { data, error } = await supabase
                     .from('newsletter_subscribers')
                     .select('*')
@@ -400,12 +420,15 @@
                 }
 
                 console.log('Subscribers fetched successfully:', data);
+                console.log('Number of subscribers:', data ? data.length : 0);
+                
                 subscribers = data || [];
                 updateStats();
                 displaySubscribers();
                 
             } catch (error) {
                 console.error('Error loading subscribers:', error);
+                console.error('Error details:', error.message, error.code);
                 showError();
             }
         }
@@ -496,6 +519,15 @@
 
         function refreshData() {
             console.log('Refresh button clicked, reloading subscribers...');
+            // Ensure Supabase is initialized before refreshing
+            if (!supabase) {
+                console.log('Reinitializing Supabase for refresh...');
+                if (!initializeSupabase()) {
+                    console.error('Cannot reinitialize Supabase');
+                    showError();
+                    return;
+                }
+            }
             loadSubscribers();
         }
 
@@ -519,7 +551,39 @@
         // Add error retry functionality
         function retryConnection() {
             console.log('Retrying connection...');
-            loadSubscribers();
+            // Force reinitialize Supabase
+            supabase = null;
+            if (initializeSupabase()) {
+                loadSubscribers();
+            } else {
+                console.error('Failed to reinitialize Supabase');
+                alert('Unable to connect to the database. Please refresh the page and try again.');
+            }
+        }
+
+        // Test function to verify Supabase connection
+        async function testSupabaseConnection() {
+            try {
+                console.log('Testing Supabase connection...');
+                if (!supabase) {
+                    throw new Error('Supabase client not initialized');
+                }
+                
+                // Simple test query
+                const { data, error } = await supabase
+                    .from('newsletter_subscribers')
+                    .select('count(*)', { count: 'exact', head: true });
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('Supabase connection test successful');
+                return true;
+            } catch (error) {
+                console.error('Supabase connection test failed:', error);
+                return false;
+            }
         }
     </script>
 </body>
