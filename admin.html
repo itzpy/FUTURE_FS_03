@@ -409,10 +409,11 @@
                 console.log('Fetching subscribers from Supabase...');
                 console.log('Supabase client status:', !!supabase);
                 
+                // Use the correct column name: subscribed_at
                 const { data, error } = await supabase
                     .from('newsletter_subscribers')
                     .select('*')
-                    .order('created_at', { ascending: false });
+                    .order('subscribed_at', { ascending: false });
 
                 if (error) {
                     console.error('Supabase query error:', error);
@@ -438,12 +439,13 @@
             const today = new Date().toDateString();
             const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
+            // Now we can calculate with subscribed_at column
             const todayCount = subscribers.filter(sub => 
-                new Date(sub.created_at).toDateString() === today
+                sub.subscribed_at && new Date(sub.subscribed_at).toDateString() === today
             ).length;
 
             const weekCount = subscribers.filter(sub => 
-                new Date(sub.created_at) >= oneWeekAgo
+                sub.subscribed_at && new Date(sub.subscribed_at) >= oneWeekAgo
             ).length;
 
             document.getElementById('totalSubscribers').textContent = total;
@@ -461,21 +463,25 @@
 
             let html = '';
             subscribers.forEach((subscriber, index) => {
-                const date = new Date(subscriber.created_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                });
-                const time = new Date(subscriber.created_at).toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
+                // Use subscribed_at column
+                const subscriberDate = subscriber.subscribed_at ? 
+                    new Date(subscriber.subscribed_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    }) : 'Unknown';
+                    
+                const subscriberTime = subscriber.subscribed_at ? 
+                    new Date(subscriber.subscribed_at).toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) : '';
                 
                 html += `
                     <tr>
                         <td style="color: rgba(255, 255, 255, 0.6);">${index + 1}</td>
-                        <td style="color: #ffffff; font-weight: 600;">${subscriber.email}</td>
-                        <td style="color: rgba(255, 255, 255, 0.7);">${date} at ${time}</td>
+                        <td style="color: #ffffff; font-weight: 600;">${subscriber.email || 'No email'}</td>
+                        <td style="color: rgba(255, 255, 255, 0.7);">${subscriberDate}${subscriberTime ? ' at ' + subscriberTime : ''}</td>
                         <td>
                             <span class="status-badge">
                                 ✅ Active
@@ -517,7 +523,8 @@
             document.getElementById('subscribersTable').classList.remove('hidden');
         }
 
-        function refreshData() {
+        // Make functions globally accessible
+        window.refreshData = function() {
             console.log('Refresh button clicked, reloading subscribers...');
             // Ensure Supabase is initialized before refreshing
             if (!supabase) {
@@ -529,7 +536,19 @@
                 }
             }
             loadSubscribers();
-        }
+        };
+
+        window.retryConnection = function() {
+            console.log('Retrying connection...');
+            // Force reinitialize Supabase
+            supabase = null;
+            if (initializeSupabase()) {
+                loadSubscribers();
+            } else {
+                console.error('Failed to reinitialize Supabase');
+                alert('Unable to connect to the database. Please refresh the page and try again.');
+            }
+        };
 
         // Add some animation when page loads
         window.addEventListener('load', function() {
@@ -549,20 +568,10 @@
         });
 
         // Add error retry functionality
-        function retryConnection() {
-            console.log('Retrying connection...');
-            // Force reinitialize Supabase
-            supabase = null;
-            if (initializeSupabase()) {
-                loadSubscribers();
-            } else {
-                console.error('Failed to reinitialize Supabase');
-                alert('Unable to connect to the database. Please refresh the page and try again.');
-            }
-        }
+        // Add error retry functionality (moved above to window.retryConnection)
 
         // Test function to verify Supabase connection
-        async function testSupabaseConnection() {
+        window.testSupabaseConnection = async function() {
             try {
                 console.log('Testing Supabase connection...');
                 if (!supabase) {
@@ -572,19 +581,21 @@
                 // Simple test query
                 const { data, error } = await supabase
                     .from('newsletter_subscribers')
-                    .select('count(*)', { count: 'exact', head: true });
+                    .select('*')
+                    .limit(1);
                 
                 if (error) {
                     throw error;
                 }
                 
                 console.log('Supabase connection test successful');
+                console.log('Sample data structure:', data[0]);
                 return true;
             } catch (error) {
                 console.error('Supabase connection test failed:', error);
                 return false;
             }
-        }
+        };
     </script>
 </body>
 </html>
