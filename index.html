@@ -592,6 +592,14 @@
 
     <!-- External JavaScript -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Ensure Supabase is loaded before other scripts
+        window.addEventListener('DOMContentLoaded', function() {
+            if (typeof window.supabase === 'undefined') {
+                console.error('Supabase library failed to load');
+            }
+        });
+    </script>
     <script src="supabase-config.js"></script>
     <script src="script.js"></script>
 </body>

@@ -61,14 +61,19 @@ document.querySelector('form').addEventListener('submit', async function(e) {
     const submitButton = this.querySelector('button[type="submit"]');
     const emailInput = this.querySelector('input[type="email"]');
     
+    console.log('Newsletter form submitted with email:', email);
+    
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
+        console.log('Invalid email format');
         showFormError(emailInput, 'Please enter a valid email address');
         return;
     }
 
     try {
+        console.log('Starting subscription process...');
+        
         // Show loading state
         submitButton.innerHTML = 'Subscribing...';
         submitButton.disabled = true;
@@ -77,14 +82,23 @@ document.querySelector('form').addEventListener('submit', async function(e) {
         // Remove any existing messages
         removeExistingMessages(this);
         
+        // Check if subscribeToNewsletter function exists
+        if (typeof subscribeToNewsletter === 'undefined') {
+            throw new Error('Newsletter subscription function not available');
+        }
+        
         // Attempt to subscribe via Supabase
+        console.log('Calling subscribeToNewsletter function...');
         const result = await subscribeToNewsletter(email);
+        console.log('Subscription result:', result);
         
         if (result.success) {
             // Success state
+            console.log('Subscription successful');
             showFormSuccess(this, submitButton, emailInput, 'Welcome to Apple updates! You\'re now subscribed.');
         } else {
             // Handle specific error types
+            console.log('Subscription failed:', result.error);
             if (result.code === 'DUPLICATE_EMAIL') {
                 showFormError(emailInput, 'This email is already subscribed to our newsletter');
             } else {
