@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsletter Subscribers - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .dashboard-card {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="admin-container">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">📧 Newsletter Subscribers</h1>
+            <p class="text-gray-200">Admin Dashboard - Apple Rebrand Project</p>
+            <a href="index.html" class="inline-block mt-4 px-6 py-2 bg-white bg-opacity-20 text-white rounded-full hover:bg-opacity-30 transition-all duration-300">
+                ← Back to Main Site
+            </a>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="dashboard-card rounded-2xl p-6 text-center">
+                <div class="text-3xl font-bold text-white mb-2" id="totalSubscribers">0</div>
+                <div class="text-gray-200">Total Subscribers</div>
+            </div>
+            <div class="dashboard-card rounded-2xl p-6 text-center">
+                <div class="text-3xl font-bold text-white mb-2" id="todaySubscribers">0</div>
+                <div class="text-gray-200">Today's Signups</div>
+            </div>
+            <div class="dashboard-card rounded-2xl p-6 text-center">
+                <div class="text-3xl font-bold text-white mb-2" id="thisWeekSubscribers">0</div>
+                <div class="text-gray-200">This Week</div>
+            </div>
+        </div>
+
+        <!-- Subscribers Table -->
+        <div class="dashboard-card rounded-2xl p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">Subscribers List</h2>
+                <button onclick="refreshData()" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-300">
+                    🔄 Refresh
+                </button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="text-center py-8">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+                <p class="text-gray-200">Loading subscribers...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="text-center py-8 hidden">
+                <p class="text-red-300 mb-4">❌ Error loading subscribers</p>
+                <button onclick="refreshData()" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-300">
+                    Try Again
+                </button>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="text-center py-8 hidden">
+                <p class="text-gray-300 mb-4">📭 No subscribers yet</p>
+                <p class="text-gray-400 text-sm">Start by testing the newsletter signup on the main site!</p>
+            </div>
+
+            <!-- Subscribers Table -->
+            <div id="subscribersTable" class="hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="border-b border-gray-600">
+                                <th class="text-gray-200 font-semibold py-3 px-4">#</th>
+                                <th class="text-gray-200 font-semibold py-3 px-4">Email</th>
+                                <th class="text-gray-200 font-semibold py-3 px-4">Subscribed Date</th>
+                                <th class="text-gray-200 font-semibold py-3 px-4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscribersTableBody">
+                            <!-- Dynamic content will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8">
+            <p class="text-gray-300 text-sm">
+                Built with ❤️ for Future Interns Task 3 | 
+                <a href="https://apple-rebrand.vercel.app/" class="text-blue-300 hover:text-blue-200">Live Demo</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Include Supabase Config -->
+    <script src="supabase-config.js"></script>
+    
+    <script>
+        // Admin Dashboard JavaScript
+        let subscribers = [];
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSubscribers();
+        });
+
+        async function loadSubscribers() {
+            try {
+                showLoading();
+                
+                const { data, error } = await supabase
+                    .from('newsletter_subscribers')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    throw error;
+                }
+
+                subscribers = data || [];
+                updateStats();
+                displaySubscribers();
+                
+            } catch (error) {
+                console.error('Error loading subscribers:', error);
+                showError();
+            }
+        }
+
+        function updateStats() {
+            const total = subscribers.length;
+            const today = new Date().toDateString();
+            const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+            const todayCount = subscribers.filter(sub => 
+                new Date(sub.created_at).toDateString() === today
+            ).length;
+
+            const weekCount = subscribers.filter(sub => 
+                new Date(sub.created_at) >= oneWeekAgo
+            ).length;
+
+            document.getElementById('totalSubscribers').textContent = total;
+            document.getElementById('todaySubscribers').textContent = todayCount;
+            document.getElementById('thisWeekSubscribers').textContent = weekCount;
+        }
+
+        function displaySubscribers() {
+            const tableBody = document.getElementById('subscribersTableBody');
+            
+            if (subscribers.length === 0) {
+                showEmpty();
+                return;
+            }
+
+            let html = '';
+            subscribers.forEach((subscriber, index) => {
+                const date = new Date(subscriber.created_at).toLocaleDateString();
+                const time = new Date(subscriber.created_at).toLocaleTimeString();
+                
+                html += `
+                    <tr class="border-b border-gray-700 hover:bg-white hover:bg-opacity-5 transition-colors duration-200">
+                        <td class="py-3 px-4 text-gray-300">${index + 1}</td>
+                        <td class="py-3 px-4 text-white font-medium">${subscriber.email}</td>
+                        <td class="py-3 px-4 text-gray-300">${date} at ${time}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-300 rounded-full text-xs">
+                                ✅ Active
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableBody.innerHTML = html;
+            showTable();
+        }
+
+        function showLoading() {
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('subscribersTable').classList.add('hidden');
+        }
+
+        function showError() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('errorState').classList.remove('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('subscribersTable').classList.add('hidden');
+        }
+
+        function showEmpty() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+            document.getElementById('emptyState').classList.remove('hidden');
+            document.getElementById('subscribersTable').classList.add('hidden');
+        }
+
+        function showTable() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('subscribersTable').classList.remove('hidden');
+        }
+
+        function refreshData() {
+            loadSubscribers();
+        }
+
+        // Add some animation when page loads
+        window.addEventListener('load', function() {
+            const cards = document.querySelectorAll('.dashboard-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.6s ease';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 200);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -28,8 +28,10 @@ A modern, responsive Apple-inspired marketing website showcasing the latest Appl
 ```
 FUTURE_FS_03/
 ├── index.html          # Main HTML file
+├── admin.html          # Admin dashboard for newsletter subscribers
 ├── styles.css          # Custom CSS styles
 ├── script.js           # JavaScript functionality
+├── supabase-config.js  # Supabase configuration and client setup
 └── README.md           # Project documentation
 ```
 
@@ -40,6 +42,14 @@ FUTURE_FS_03/
 - **Glass Morphism**: Modern glass effects in navigation
 - **Product Photography**: High-quality product images
 - **Apple Intelligence**: AI-focused messaging and branding
+- **Admin Dashboard**: Newsletter subscriber management interface
+
+## 🔧 Backend Features
+
+- **Newsletter Subscriptions**: Real-time email collection with Supabase
+- **Admin Dashboard**: View subscriber statistics and email list
+- **Data Validation**: Email format validation and duplicate prevention
+- **Real-time Updates**: Live subscriber count and analytics
 
 ## 🚀 Getting Started
 
@@ -58,6 +68,15 @@ FUTURE_FS_03/
    ```
 
 3. Visit `http://localhost:8000` to view the site
+
+4. Access the admin dashboard at `http://localhost:8000/admin.html` to view newsletter subscribers
+
+## 🔗 Live Demo Features
+
+- **Main Site**: Complete Apple rebrand with AI focus
+- **Newsletter Signup**: Working subscription system
+- **Admin Dashboard**: Real-time subscriber analytics
+- **Responsive Design**: Perfect on all devices
 
 ## 📱 Responsive Design
 
